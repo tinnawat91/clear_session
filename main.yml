@@ -11,6 +11,6 @@
       register: user_session
       ignore_errors: true
 
-    - name: Include display.yml
-      include_tasks: display.yml
+    - name: Include clear_session.yml
+      include_tasks: clear_session.yml
       loop: "{{ user_session.stdout_lines[1:] }}"
