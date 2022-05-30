@@ -1,4 +1,4 @@
 ---
 - name: Display User Session
   debug:
-    msg: "{{ item }}"
+    msg: "{{ item.split(' ') }}"
