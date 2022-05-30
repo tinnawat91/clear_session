@@ -1,0 +1,7 @@
+---
+- name: Clear Windows User Session
+  hosts: Windows
+  tasks:
+    - name: Debug
+      debug:
+        msg: "Hello World"
