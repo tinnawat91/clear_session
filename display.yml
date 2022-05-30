@@ -1,4 +1,4 @@
 ---
 - name: Display User Session
   debug:
-    msg: "{{ item | regex_replace('\s*', ' ') }}"
+    msg: "{{ item | regex_replace((\\s)*', ' ') }}"
