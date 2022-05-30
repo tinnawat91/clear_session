@@ -3,7 +3,7 @@
   debug:
     msg: "{{ ((item | regex_replace('\\s+', ' ')) | trim ).split(' ')[2] }}"
 
-  set_fact:
+- set_fact:
     id: "{{ ((item | regex_replace('\\s+', ' ')) | trim ).split(' ')[2] }}"
 
 - name: Clear Session
