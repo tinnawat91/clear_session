@@ -5,3 +5,11 @@
     - name: Debug
       debug:
         msg: "Hello World"
+
+    - name: Query User Session
+      win_command: query user
+      register: user_session
+
+    - name: Display User Session
+      debug:
+        msg: "{{ user_session.stdout_lines }}"
