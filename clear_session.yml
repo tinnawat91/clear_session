@@ -9,6 +9,7 @@
     - name: Query User Session
       win_command: "query user"
       register: user_session
+      ignore_errors: true
 
     - name: Display User Session
       debug:
