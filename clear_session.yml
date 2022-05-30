@@ -11,8 +11,6 @@
       register: user_session
       ignore_errors: true
 
-    - block:
-        - name: Display User Session
-          debug:
-            msg: "{{ item.split(' ')[2] }}"
+    - name: Include display.yml
+      include_tasks: display.yml
       loop: "{{ user_session.stdout_lines }}"
