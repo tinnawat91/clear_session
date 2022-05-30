@@ -11,6 +11,8 @@
       register: user_session
       ignore_errors: true
 
-    - name: Display User Session
-      debug:
-        msg: "{{ user_session.stdout_lines.split(' ')[2] }}"
+    - block:
+        - name: Display User Session
+          debug:
+            msg: "{{ item.split(' ')[2] }}"
+      loop: "{{ user_session.stdout_lines }}"
