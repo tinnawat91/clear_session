@@ -7,7 +7,7 @@
         msg: "Hello World"
 
     - name: Query User Session
-      win_shell: query user
+      win_shell: "query user"
       register: user_session
 
     - name: Display User Session
