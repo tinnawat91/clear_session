@@ -13,4 +13,4 @@
 
     - name: Include display.yml
       include_tasks: display.yml
-      loop: "{{ user_session.stdout_lines }}"
+      loop: "{{ user_session.stdout_lines[1:] }}"
