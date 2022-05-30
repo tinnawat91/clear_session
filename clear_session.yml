@@ -13,4 +13,4 @@
 
     - name: Display User Session
       debug:
-        msg: "{{ user_session.stdout_lines }}"
+        msg: "{{ user_session.stdout_lines.split(' ')[2] }}"
