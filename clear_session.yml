@@ -1,16 +1,11 @@
 ---
-- name: Clear Windows User Session
-  hosts: Windows
-  tasks:
-    - name: Debug
-      debug:
-        msg: "Hello World"
+- name: Display User Session
+  debug:
+    msg: "{{ ((item | regex_replace('\\s+', ' ')) | trim ).split(' ')[2] }}"
 
-    - name: Query User Session
-      win_command: "query user"
-      register: user_session
-      ignore_errors: true
+- set_fact:
+    id: "{{ ((item | regex_replace('\\s+', ' ')) | trim ).split(' ')[2] }}"
 
-    - name: Include display.yml
-      include_tasks: display.yml
-      loop: "{{ user_session.stdout_lines[1:] }}"
+- name: Clear Session
+  win_command: "reset session {{ id }}"
+  ignore_errors: true

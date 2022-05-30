@@ -1,0 +1,16 @@
+---
+- name: Clear Windows User Session
+  hosts: Windows
+  tasks:
+    - name: Debug
+      debug:
+        msg: "Hello World"
+
+    - name: Query User Session
+      win_command: "query user"
+      register: user_session
+      ignore_errors: true
+
+    - name: Include display.yml
+      include_tasks: display.yml
+      loop: "{{ user_session.stdout_lines[1:] }}"
