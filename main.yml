@@ -7,10 +7,24 @@
         msg: "Hello World"
 
     - name: Query User Session
-      win_command: "query process 5224"
-      register: user_session
+      win_command: "query process mobaxterm.exe"
+      register: process
       ignore_errors: true
 
-    - name: Include clear_session.yml
-      include_tasks: clear_session.yml
-      loop: "{{ user_session.stdout_lines[1:] }}"
+    - name: Display process
+      debug:
+        msg: "{{ process.stdout_lines }}"
+
+    - name: Terminate process
+      win_command: "taskkill /F /IM mobaxterm.exe"
+      ignore_errors: true
+
+    - name: Wait for terminater process successes
+      win_wait_for:
+        path: D:\Application\MobaXterm_Portable_v22.0\mobaxterm.exe
+        regex: terminated.
+
+
+    # - name: Include clear_session.yml
+    #   include_tasks: clear_session.yml
+    #   loop: "{{ process.stdout_lines[1:] }}"
