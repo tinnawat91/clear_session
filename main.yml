@@ -4,10 +4,6 @@
   vars:
     proc: mobaxterm.exe
   tasks:
-    - name: Debug
-      debug:
-        msg: "Hello World"
-
     - name: Query User Session
       win_command: "query process {{ proc }}"
       register: process
@@ -31,7 +27,7 @@
       rescue:
         - name: Process "{{ proc }}" not running
           debug:
-            msg: "No Process exists for {{ proc ]}"
+            msg: "No Process exists for {{ proc }}"
 
         - meta: end_play
 
