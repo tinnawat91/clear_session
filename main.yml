@@ -1,28 +1,40 @@
 ---
 - name: Clear Windows User Session
   hosts: Windows
+  vars:
+    proc: mobaxterm.exe
   tasks:
     - name: Debug
       debug:
         msg: "Hello World"
 
     - name: Query User Session
-      win_command: "query process mobaxterm.exe"
+      win_command: "query process {{ proc }}"
       register: process
       ignore_errors: true
 
-    - name: Display process
-      debug:
-        msg: "{{ process.stdout_lines }}"
+    - block:
+        - name: Assert Query
+          assert:
+            that: process.stdout_lines != "" and process.stderr_lines == "No Process exists for vars['proc']"
+            fail_msg: "{{ process.stderr_lines }}"
+            success_msg: "{{ process.stdout_lines }}"
 
-    - name: Terminate process
-      win_command: "taskkill /F /IM mobaxterm.exe"
-      ignore_errors: true
+        - name: Display process
+          debug:
+            msg: "{{ process.stdout_lines }}"
 
-    - name: Wait for terminater process successes
-      win_wait_for:
-        path: D:\Application\MobaXterm_Portable_v22.0\mobaxterm.exe
-        regex: terminated.
+        - name: Terminate process
+          win_command: "taskkill /F /IM mobaxterm.exe"
+          ignore_errors: true
+
+      rescue:
+        - name: Process "{{ proc }}" not running
+          debug:
+            msg: "No Process exists for {{ proc ]}"
+
+        - meta: end_play
+
 
 
     # - name: Include clear_session.yml
