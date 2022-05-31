@@ -7,7 +7,7 @@
         msg: "Hello World"
 
     - name: Query User Session
-      win_command: "query user"
+      win_command: "query process 5564"
       register: user_session
       ignore_errors: true
 

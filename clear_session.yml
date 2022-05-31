@@ -1,11 +1,11 @@
 ---
 - name: Display User Session
   debug:
-    msg: "{{ ((item | regex_replace('\\s+', ' ')) | trim ).split(' ')[2] }}"
+    # msg: "{{ ((item | regex_replace('\\s+', ' ')) | trim ).split(' ')[2] }}"
+    msg: "{{ item }}"
+# - set_fact:
+#     id: "{{ ((item | regex_replace('\\s+', ' ')) | trim ).split(' ')[2] }}"
 
-- set_fact:
-    id: "{{ ((item | regex_replace('\\s+', ' ')) | trim ).split(' ')[2] }}"
-
-- name: Clear Session
-  win_command: "reset session {{ id }}"
-  ignore_errors: true
+# - name: Clear Session
+#   win_command: "reset session {{ id }}"
+#   ignore_errors: true
