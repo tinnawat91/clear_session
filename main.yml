@@ -12,7 +12,7 @@
     - block:
         - name: Assert Query
           assert:
-            that: process.stdout_lines != "" and process.stderr_lines == "No Process exists for vars[proc]"
+            that: process.stdout_lines != "" and process.stderr_lines == "No Process exists for mobaxterm.exe"
             fail_msg: "{{ process.stderr_lines }}"
             success_msg: "{{ process.stdout_lines }}"
 
