@@ -4,32 +4,38 @@
   vars:
     proc: mobaxterm.exe
   tasks:
-    - name: Query User Session
-      win_command: "query process {{ proc }}"
-      register: process
+
+    - name: Terminate process
+      win_command: "taskkill /F /IM mobaxterm.exe"
       ignore_errors: true
 
-    - block:
-        - name: Assert Query
-          assert:
-            that: process.stdout_lines != "" and process.stderr_lines == "No Process exists for mobaxterm.exe"
-            fail_msg: "{{ process.stderr_lines }}"
-            success_msg: "{{ process.stdout_lines }}"
+    - meta: end_play
+    # - name: Query User Session
+    #   win_command: "query process {{ proc }}"
+    #   register: process
+    #   ignore_errors: true
 
-        - name: Display process
-          debug:
-            msg: "{{ process.stdout_lines }}"
+    # - block:
+    #     - name: Assert Query
+    #       assert:
+    #         that: process.stdout_lines != "" and process.stderr_lines != "No Process exists for mobaxterm.exe"
+    #         fail_msg: "{{ process.stderr_lines }}"
+    #         success_msg: "{{ process.stdout_lines }}"
 
-        - name: Terminate process
-          win_command: "taskkill /F /IM mobaxterm.exe"
-          ignore_errors: true
+        # - name: Display process
+        #   debug:
+        #     msg: "{{ process.stdout_lines }}"
 
-      rescue:
-        - name: Process "{{ proc }}" not running
-          debug:
-            msg: "No Process exists for {{ proc }}"
+        # - name: Terminate process
+        #   win_command: "taskkill /F /IM mobaxterm.exe"
+        #   ignore_errors: true
 
-        - meta: end_play
+      # rescue:
+      #   - name: Process "{{ proc }}" not running
+      #     debug:
+      #       msg: "No Process exists for {{ proc }}"
+
+        # - meta: end_play
 
 
 
