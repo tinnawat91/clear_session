@@ -9,7 +9,7 @@
       - backup
   
   - set_fact:
-      backup_file: "test_win_log_{{ ansible _date_time.iso8601 }}.zip"
+      backup_file: "test_win_log_{{ ansible_date_time.date }}.zip"
 
   - name: Stop CMD
     block:
