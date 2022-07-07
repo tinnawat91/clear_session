@@ -2,7 +2,7 @@
   hosts: windows2
   tasks:
   - name: Backup existing software file
-    win_command: "tar -cf C:\Users\{{ user }}\test_win_log_{{ ansible _date_time.iso8601 }}.zip C:\Users\{{ user }}\test_win_log.txt"
+    win_command: tar -cf C:\Users\"{{ user }}"\test_win_log_"{{ ansible _date_time.iso8601 }}".zip C:\Users\"{{ user }}"\test_win_log.txt
     tags:
       - backup
   
