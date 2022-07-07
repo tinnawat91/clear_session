@@ -128,7 +128,9 @@
 
     rescue:
       - name: Roll back in case failure
-        win_command: tar -xf C:\Users\{{ user }}\{{ backup_file }}
+        win_command: tar -xf {{ backup_file }}
+        args:
+          chdir: C:\Users\{{ user }}
         tags:
           - rollback
     
