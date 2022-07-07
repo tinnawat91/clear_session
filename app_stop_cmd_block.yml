@@ -1,0 +1,42 @@
+- hosts: windows
+  tasks:
+  - name: Warning before kill process
+    win_msg:
+      display_seconds: 30
+      msg: Automation will terminate process {{ service_name }} in 30 seconds
+      
+  - name: Delay 30 seconds
+    win_wait_for:
+      timeout: 30
+
+  - name: Kill Process Loop
+    block:
+      - name: =================Get Process !!!!!!!==================[1]
+        win_command: tasklist /FI "IMAGENAME eq {{service_name}}"
+        register: get_process_output
+        # failed_when: get_process_output.stdout == "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
+      - debug:
+          var: get_process_output
+
+      - name: =================Kill Process !!!!!!==================[2]
+        win_command: taskkill /im {{service_name}} /t /f
+        register: kill_process_output
+        ignore_errors : yes
+      - debug:
+          var: kill_process_output
+
+      - name: =================Get Process Check After Kill !!!!!!!==================[3]
+        win_command: tasklist /FI "IMAGENAME eq {{service_name}}"
+        register: result_output
+        failed_when: result_output.stdout != "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
+        until: result_output.stdout != "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
+        retries: 3
+        delay: 10
+      - debug:
+          var: result_output
+    rescue:
+      - debug:
+          msg: "Try to kill process again"
+
+      - include_tasks: app_stop_cmd_block_recheck.yml
+

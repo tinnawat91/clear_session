@@ -1,0 +1,36 @@
+- name: Kill Process Loop
+  block:
+    - name: Increment the retry count
+      set_fact:
+        retry_count: "{{ 0 if retry_count is undefined else retry_count | int + 1 }}"
+    - name: =================Get Process !!!!!!!==================
+      win_command: tasklist /FI "IMAGENAME eq {{service_name}}"
+      register: get_process_output
+      # failed_when: get_process_output.stdout == "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
+    - debug:
+        var: get_process_output
+
+    - name: =================Kill Process !!!!!!==================
+      win_command: taskkill /im {{service_name}} /t /f
+      register: kill_process_output
+      ignore_errors : yes
+    - debug:
+        var: kill_process_output
+
+    - name: =================Get Process Check After Kill !!!!!!!==================
+      win_command: tasklist /FI "IMAGENAME eq {{service_name}}"
+      register: result_output
+      failed_when: result_output.stdout != "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
+      until: result_output.stdout != "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
+      retries: 3
+      delay: 10
+    - debug:
+        var: result_output
+  rescue:
+    - fail:
+        msg: Maximum retries of grouped tasks reached
+      when: retry_count | int == 3
+    - debug:
+        msg: "Try to kill process again"
+
+    - include_tasks: app_stop_cmd_block_recheck.yml

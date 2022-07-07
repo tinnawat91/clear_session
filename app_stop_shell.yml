@@ -1,0 +1,10 @@
+---
+- hosts: service
+  tasks:
+  - name: Stop Process till Stoped !!!!!!!
+    win_shell: Get-Process -Name win32calc | Stop-Process -Force
+    register: running_process_output
+    until: running_process_output.failed == true
+    retries: 5
+    delay: 10
+    ignore_errors : yes

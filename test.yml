@@ -1,0 +1,8 @@
+---
+- name: For Test modules
+  hosts: windows
+  tasks:
+    - name: Test
+      win_msg:
+        display_seconds: 30
+        msg: Automation will terminate process {{ service_name }} in 30 seconds
