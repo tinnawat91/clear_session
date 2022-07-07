@@ -111,14 +111,14 @@
           - terminate_process
 
       - name: Replace a new .exe app file
-        win_powershell:
+        win_shell:
           script: |
             C:\Users\{{ user }}\log.exe
         tags:
           - replace
 
       - name: Testing .exe app and get version
-        win_powershell:
+        win_shell:
           script: |
             C:\Users\{}{ user }}\test.exe
         tags:
