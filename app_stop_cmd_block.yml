@@ -47,6 +47,7 @@
               - name: =================Get User !!!!!!!==================[1]
                 win_command: "query user {{ user }}"
                 register: get_user_output
+                ignore_errors: yes
                 # failed_when: get_process_output.stdout == "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
               - debug:
                   msg: 
@@ -67,6 +68,7 @@
                 until: result_output.stdout != "No User exists for {{ user }}\r\n"
                 retries: 3
                 delay: 10
+                ignore_errors: yes
               - debug:
                   var: result_output
             rescue:
