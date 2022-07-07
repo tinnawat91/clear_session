@@ -14,7 +14,7 @@
           - "{{ get_user_output | regex_replace('\\s+', ' ').split(' ')[2] }}"
 
     - name: =================Terminate User !!!!!!==================[2]
-      win_command: "logoff {{ get_user_output | regex_replace('\\s+', ' ').split(' ')[2] }}"
+      win_command: "logoff {{ (get_user_output | regex_replace('\\s+', ' ') | trim).split(' ')[2] }}"
       register: kill_user_output
       ignore_errors : yes
     - debug:
