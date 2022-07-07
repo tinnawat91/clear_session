@@ -1,42 +1,134 @@
-- hosts: windows
+- name: App stop CMD
+  hosts: windows
   tasks:
-  - name: Warning before kill process
-    win_msg:
-      display_seconds: 30
-      msg: Automation will terminate process {{ service_name }} in 30 seconds
-      
-  - name: Delay 30 seconds
-    win_wait_for:
-      timeout: 30
+  - name: Backup existing software file
+    win_zip:
+      src: C:\Users\tinnawat91\log.txt
+      dest: C:\Users\tinnawat91\log.zip
+    tags:
+      - backup
 
-  - name: Kill Process Loop
+  - name: Stop CMD
     block:
-      - name: =================Get Process !!!!!!!==================[1]
-        win_command: tasklist /FI "IMAGENAME eq {{service_name}}"
-        register: get_process_output
-        # failed_when: get_process_output.stdout == "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
-      - debug:
-          var: get_process_output
+      - name: Download artifact from Nexus
+        maven_artifact:
+          group_id: com.setup
+          artifact_id: customerfile
+          repository_url: 'http://10.0.3.11:8081/repository/maven-releases/'
+          username: uname
+          password: pass
+          dest: /tmp/customerfile.jar
+        tags:
+          - download
 
-      - name: =================Kill Process !!!!!!==================[2]
-        win_command: taskkill /im {{service_name}} /t /f
-        register: kill_process_output
-        ignore_errors : yes
-      - debug:
-          var: kill_process_output
+      - name: Upload artifact to target server
+        win_copy:
+          src: /tmp/log.txt
+          dest: C:\Users\tinnawat91\log.txt
+        tags:
+          - upload
 
-      - name: =================Get Process Check After Kill !!!!!!!==================[3]
-        win_command: tasklist /FI "IMAGENAME eq {{service_name}}"
-        register: result_output
-        failed_when: result_output.stdout != "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
-        until: result_output.stdout != "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
-        retries: 3
-        delay: 10
-      - debug:
-          var: result_output
+      - name: Terminate user session on terminal server
+        block:    
+          - name: Warning before terminate user
+            win_msg:
+              display_seconds: 30
+              msg: Automation will terminate user {{ user }} in 30 seconds
+          
+          - name: Delay 30 seconds
+            win_wait_for:
+              timeout: 30
+
+          - name: Terminate user Loop
+            block:
+              - name: =================Get User !!!!!!!==================[1]
+                win_command: "query user {{ user }}"
+                register: get_user_output
+                # failed_when: get_process_output.stdout == "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
+              - debug:
+                  msg: 
+                    - "{{ get_user_output }}"
+                    - "{{ get_user_output | regex_replace('\\s+', ' ').split(' ')[2] }}"
+
+              - name: =================Terminate User !!!!!!==================[2]
+                win_command: "logoff {{ get_user_output | regex_replace('\\s+', ' ').split(' ')[2] }}"
+                register: kill_user_output
+                ignore_errors : yes
+              - debug:
+                  var: terminate_user_output
+
+              - name: =================Get user check after terminate !!!!!!!==================[3]
+                win_command: "query user {{ user }}"
+                register: result_output
+                failed_when: result_output.stdout != "No User exists for {{ user }}\r\n"
+                until: result_output.stdout != "No User exists for {{ user }}\r\n"
+                retries: 3
+                delay: 10
+              - debug:
+                  var: result_output
+            rescue:
+              - debug:
+                  msg: "Try to terminate user again"
+
+              - include_tasks: app_stop_cmd_block_recheck.yml
+        tags:
+          - terminate_user
+
+      - name: Stop Target Service Process
+        block:
+          - name: Kill Process Loop
+            block:
+              - name: =================Get Process !!!!!!!==================[1]
+                win_command: tasklist /FI "IMAGENAME eq {{service_name}}"
+                register: get_process_output
+                # failed_when: get_process_output.stdout == "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
+              - debug:
+                  var: get_process_output
+
+              - name: =================Kill Process !!!!!!==================[2]
+                win_command: taskkill /im {{service_name}} /t /f
+                register: kill_process_output
+                ignore_errors : yes
+              - debug:
+                  var: kill_process_output
+
+              - name: =================Get Process Check After Kill !!!!!!!==================[3]
+                win_command: tasklist /FI "IMAGENAME eq {{service_name}}"
+                register: result_output
+                failed_when: result_output.stdout != "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
+                until: result_output.stdout != "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
+                retries: 3
+                delay: 10
+              - debug:
+                  var: result_output
+            rescue:
+              - debug:
+                  msg: "Try to kill process again"
+
+              - include_tasks: app_stop_cmd_block_recheck.yml
+        tags:
+          - terminate_process
+
+      - name: Replace a new .exe app file
+        win_powershell:
+          script: |
+            C:\Users\tinnawat91\log.exe
+        tags:
+          - replace
+
+      - name: Testing .exe app and get version
+        win_powershell:
+          script: |
+            C:\Users\tinnawat91\test.exe
+        tags:
+          - test
+
     rescue:
-      - debug:
-          msg: "Try to kill process again"
-
-      - include_tasks: app_stop_cmd_block_recheck.yml
-
+      - name: Roll back in case failure
+        win_unzip:
+          src: C:\Users\tinnawat91\log.zip
+          dest: C:\Users\tinnawat91\log.txt
+        tags:
+          - rollback
+    
+    
