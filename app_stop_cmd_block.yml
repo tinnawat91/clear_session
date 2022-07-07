@@ -28,6 +28,7 @@
         win_copy:
           src: /tmp/new_log.txt
           dest: C:\Users\{{ user }}\new_log.txt
+        delegate_to: localhost
         tags:
           - upload
 
