@@ -1,0 +1,38 @@
+- name: Kill Process Loop
+  block:
+    - name: Increment the retry count
+      set_fact:
+        retry_count: "{{ 0 if retry_count is undefined else retry_count | int + 1 }}"
+    - name: =================Get Process !!!!!!!==================
+      win_command: "query user {{ user }}"
+      register: get_user_output
+      # failed_when: get_process_output.stdout == "INFO{{ ":" }} No tasks are running which match the specified criteria.\r\n"
+    - debug:
+        msg: 
+          - "{{ get_user_output }}"
+          - "{{ get_user_output | regex_replace('\\s+', ' ').split(' ')[2] }}"
+
+    - name: =================Terminate User !!!!!!==================[2]
+      win_command: "logoff {{ get_user_output | regex_replace('\\s+', ' ').split(' ')[2] }}"
+      register: kill_user_output
+      ignore_errors : yes
+    - debug:
+        var: terminate_user_output
+
+    - name: =================Get user check after terminate !!!!!!!==================[3]
+      win_command: "query user {{ user }}"
+      register: result_output
+      failed_when: result_output.stdout != "No User exists for {{ user }}\r\n"
+      until: result_output.stdout != "No User exists for {{ user }}\r\n"
+      retries: 3
+      delay: 10
+    - debug:
+        var: result_output
+  rescue:
+    - fail:
+        msg: Maximum retries of grouped tasks reached
+      when: retry_count | int == 3
+    - debug:
+        msg: "Try to terminate user again"
+
+    - include_tasks: app_stop_cmd_user_recheck.yml

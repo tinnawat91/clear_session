@@ -70,7 +70,7 @@
               - debug:
                   msg: "Try to terminate user again"
 
-              - include_tasks: app_stop_cmd_block_recheck.yml
+              - include_tasks: app_stop_cmd_user_recheck.yml
         tags:
           - terminate_user
 
