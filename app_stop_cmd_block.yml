@@ -2,7 +2,7 @@
   hosts: windows2
   tasks:
   - name: Backup existing software file
-    win_command: tar -cf C:/Users/{{ user }}/test_win_log_{{ ansible_date_time.iso8601 }}.zip C:/Users/{{ user }}/test_win_log.txt
+    win_command: tar -cf C:\Users\{{ user }}\test_win_log_{{ ansible_date_time.iso8601 }}.zip C:\Users\{{ user }}\test_win_log.txt
     tags:
       - backup
   
@@ -25,7 +25,7 @@
       - name: Upload artifact to target server
         win_copy:
           src: /tmp/new_log.txt
-          dest: C:/Users/{{ user }}/new_log.txt
+          dest: C:\Users\{{ user }}\new_log.txt
         tags:
           - upload
 
@@ -113,20 +113,20 @@
       - name: Replace a new .exe app file
         win_shell:
           script: |
-            C:/Users/{{ user }}/log.exe
+            C:\Users\{{ user }}\log.exe
         tags:
           - replace
 
       - name: Testing .exe app and get version
         win_shell:
           script: |
-            C:/Users/{{ user }}/test.exe
+            C:\Users\{{ user }}\test.exe
         tags:
           - test
 
     rescue:
       - name: Roll back in case failure
-        win_command: tar -xf C:/Users/{{ user }}/{{ backup_file }}
+        win_command: tar -xf C:\Users\{{ user }}\{{ backup_file }}
         tags:
           - rollback
     
