@@ -1,4 +1,4 @@
-- hosts: windows
+- hosts: windows2
   tasks:
   - name: Warning before kill process
     win_msg:

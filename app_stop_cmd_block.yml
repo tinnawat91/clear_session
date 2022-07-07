@@ -1,5 +1,5 @@
 - name: App stop CMD
-  hosts: windows
+  hosts: windows2
   tasks:
   - name: Backup existing software file
     win_zip:
